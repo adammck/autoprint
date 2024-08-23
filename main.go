@@ -13,9 +13,12 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/adrg/xdg"
 )
 
 const (
+	xdgAppName      = "autoprint"
 	unknownFilename = "unknown-filename"
 	etagFilePattern = "etag-%s.txt"
 	tmpDirPattern   = "autoprint-*"
@@ -51,15 +54,19 @@ func main() {
 }
 
 func innerMain(url string, dryRun, force bool) int {
-	etagFn := getEtagFilename(etagFilePattern, url)
-	etagPath := filepath.Join(os.TempDir(), etagFn)
-	etagPrev, err := readLastEtag(etagPath)
+	etagPath, err := getEtagPath(etagFilePattern, url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "readLastModified: %v\n", err)
+		fmt.Fprintf(os.Stderr, "getEtagPath: %v\n", err)
 		return 1
 	}
 
-	log.Printf("previous etag: fn=%#v etag=%#v\n", etagFn, etagPrev)
+	etagPrev, err := readLastEtag(etagPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "readLastEtag: %v\n", err)
+		return 1
+	}
+
+	log.Printf("previous etag: fn=%#v etag=%#v\n", etagPath, etagPrev)
 
 	if force {
 		log.Println("ignoring previous etag")
@@ -135,7 +142,7 @@ func innerMain(url string, dryRun, force bool) int {
 
 	err = writeLastEtag(etagPath, etagNext)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "writeLastModified: %v\n", err)
+		fmt.Fprintf(os.Stderr, "writeLastEtag: %v\n", err)
 		return 1
 	}
 
@@ -144,11 +151,17 @@ func innerMain(url string, dryRun, force bool) int {
 	return 0
 }
 
-// getEtagFilename returns the path to the etag file for the given URL.
+// getEtagFilename returns the filename of the etag file for the given URL.
 func getEtagFilename(pattern, url string) string {
 	hash := sha256.Sum256([]byte(url))
 	str := hex.EncodeToString(hash[:])
 	return fmt.Sprintf(pattern, str)
+}
+
+// getEtagPath returns the full path to the etag file for the given URL.
+func getEtagPath(pattern, url string) (string, error) {
+	rel := filepath.Join(xdgAppName, getEtagFilename(pattern, url))
+	return xdg.DataFile(rel)
 }
 
 // readLastEtag returns the etag from the given path, or an empty string if the

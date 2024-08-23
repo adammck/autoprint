@@ -11,7 +11,7 @@ func TestInnerMain(t *testing.T) {
 	t.Skip("not implemented")
 }
 
-func TestGetEtagPath(t *testing.T) {
+func TestGetEtagFilename(t *testing.T) {
 	tests := []struct {
 		url      string
 		pattern  string
@@ -27,6 +27,10 @@ func TestGetEtagPath(t *testing.T) {
 			require.Equal(t, tt.expected, actual)
 		})
 	}
+}
+
+func TestGetEtagPath(t *testing.T) {
+	t.Skip("not implemented")
 }
 
 func TestReadLastEtag(t *testing.T) {
