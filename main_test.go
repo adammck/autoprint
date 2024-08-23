@@ -30,19 +30,19 @@ func TestGetEtagFilename(t *testing.T) {
 }
 
 func TestGetEtagPath(t *testing.T) {
-	t.Skip("not implemented")
+	t.Skip("not implemented; data dir is not portable")
 }
 
 func TestReadLastEtag(t *testing.T) {
-	t.Skip("not implemented")
+	t.Skip("not implemented; need mock filesystem")
 }
 
 func TestWriteLastEtag(t *testing.T) {
-	t.Skip("not implemented")
+	t.Skip("not implemented; need mock filesystem")
 }
 
 func TestDoRequest(t *testing.T) {
-	t.Skip("not implemented")
+	t.Skip("not implemented; need mock http")
 }
 
 func TestExtractFilename(t *testing.T) {
@@ -82,5 +82,5 @@ func TestExtractFilename(t *testing.T) {
 }
 
 func TestWriteOutput(t *testing.T) {
-	t.Skip("not implemented")
+	t.Skip("not implemented; need mock filesystem")
 }
